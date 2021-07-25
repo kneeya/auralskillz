@@ -1,8 +1,4 @@
-import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
-
-function Index() {
+function Home() {
   return (
     <div className="App">
       <div class="bg"></div>
@@ -11,4 +7,4 @@ function Index() {
   );
 }
 
-export default Index;
+export default Home;
