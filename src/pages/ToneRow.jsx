@@ -8,6 +8,63 @@ function HackSpacer() {
   );
 }
 
+function IntervalSelectionBox(props) {
+  return (
+    <table><tr><td>{props.interval}</td><td>{props.check}</td></tr></table>
+  );
+}
+
+class ToneRowIntervalButtons extends React.Component {
+  constructor(props) {
+    super(props);
+    this.onSelectInterval = this.onSelectInterval.bind(this);
+  }
+  
+  onSelectInterval(e) {
+    this.props.onSelectInterval(e.target.id);
+  }
+
+  render() {
+    return (
+      <div>
+      <p>
+        <div class="button-area-line">
+          <button onClick={this.onSelectInterval}
+                  id='m2' type="button" class="btn btn-secondary">m2</button>
+          <button onClick={this.onSelectInterval}
+                  id='M2' type="button" class="btn btn-secondary">M2</button>
+          <button onClick={this.onSelectInterval}
+                  id='m3' type="button" class="btn btn-secondary">m3</button>
+          <button onClick={this.onSelectInterval}
+                  id='M3' type="button" class="btn btn-secondary">M3</button><br/>
+        </div>
+        <div class="button-area-line">
+          <button onClick={this.onSelectInterval}
+                  id='P4' type="button" class="btn btn-secondary">P4</button>
+          <button onClick={this.onSelectInterval}
+                  id='tritone' type="button" class="btn btn-secondary">tritone</button>
+          <button onClick={this.onSelectInterval}
+                  id='P5' type="button" class="btn btn-secondary">P5</button><br/>
+        </div>
+        <div class="button-area-line">
+          <button onClick={this.onSelectInterval}
+                  id='m6' type="button" class="btn btn-secondary">m6</button>
+          <button onClick={this.onSelectInterval}
+                  id='M6' type="button" class="btn btn-secondary">M6</button>
+          <button onClick={this.onSelectInterval}
+                  id='m7' type="button" class="btn btn-secondary">m7</button>
+          <button onClick={this.onSelectInterval}
+                  id='M7' type="button" class="btn btn-secondary">M7</button><br/>
+        </div>
+        <div class="button-area-line">
+          <button id='score' onclick='onScore()' type="button" class="btn btn-secondary larger">Score</button>
+        </div>
+      </p>
+      </div>
+    );
+  }
+}
+
 class ToneRowSettings extends React.Component {
   constructor(props) {
     super(props);
@@ -98,12 +155,15 @@ class ToneRowTransport extends React.Component {
 class ToneRow extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {speed: 1, length: 2};
+    this.state = {speed: 1,
+                  length: 2,
+                  answers: []};
     this.handleSpeedChange = this.handleSpeedChange.bind(this);
     this.handleLengthChange = this.handleLengthChange.bind(this);
     this.handleNew = this.handleNew.bind(this);
     this.handlePlay = this.handlePlay.bind(this);
     this.handleStop = this.handleStop.bind(this);
+    this.handleSelectInterval = this.handleSelectInterval.bind(this);
   }
 
   handleSpeedChange(value) {
@@ -123,7 +183,15 @@ class ToneRow extends React.Component {
   handleStop() {
   }
 
+  handleSelectInterval(value) {
+    this.setState({answers: [value]});
+  }
+
   render() {
+    const intervalAnswers =
+            this.state.answers.map((answer) => 
+              <IntervalSelectionBox interval={answer} check="x" />
+            );
     return (
       <div>
         <div className="Exercises">
@@ -136,6 +204,8 @@ class ToneRow extends React.Component {
             <ToneRowTransport onNew={this.handleNew}
                               onPlay={this.handlePlay}
                               onStop={this.handleStop}/>
+            <ToneRowIntervalButtons onSelectInterval={this.handleSelectInterval}/>
+            {intervalAnswers}
           </div>
         </div>
       </div>
