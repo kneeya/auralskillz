@@ -1,4 +1,6 @@
 import React from 'react';
+import styled from 'styled-components';
+// import './ToneRow.css';
 
 function HackSpacer() {
   return (
@@ -9,8 +11,14 @@ function HackSpacer() {
 }
 
 function IntervalSelectionBox(props) {
+  const Input = styled.input`
+    background-color: ${props => props.highlight ?
+        "palegreen" : "white"};
+    visibility: ${props => props.hidden ?
+        "hidden" : "visible"};
+  `;
   return (
-    <table><tr><td>{props.interval}</td><td>{props.check}</td></tr></table>
+    <table><tbody><tr hidden={props.hidden}><td><Input highlight={props.highlight} readOnly value={props.interval} /></td><td>{props.check}</td></tr></tbody></table>
   );
 }
 
@@ -27,39 +35,37 @@ class ToneRowIntervalButtons extends React.Component {
   render() {
     return (
       <div>
-      <p>
-        <div class="button-area-line">
+        <div className="button-area-line">
           <button onClick={this.onSelectInterval}
-                  id='m2' type="button" class="btn btn-secondary">m2</button>
+                  id='m2' type="button" className="btn btn-secondary">m2</button>
           <button onClick={this.onSelectInterval}
-                  id='M2' type="button" class="btn btn-secondary">M2</button>
+                  id='M2' type="button" className="btn btn-secondary">M2</button>
           <button onClick={this.onSelectInterval}
-                  id='m3' type="button" class="btn btn-secondary">m3</button>
+                  id='m3' type="button" className="btn btn-secondary">m3</button>
           <button onClick={this.onSelectInterval}
-                  id='M3' type="button" class="btn btn-secondary">M3</button><br/>
+                  id='M3' type="button" className="btn btn-secondary">M3</button><br/>
         </div>
-        <div class="button-area-line">
+        <div className="button-area-line">
           <button onClick={this.onSelectInterval}
-                  id='P4' type="button" class="btn btn-secondary">P4</button>
+                  id='P4' type="button" className="btn btn-secondary">P4</button>
           <button onClick={this.onSelectInterval}
-                  id='tritone' type="button" class="btn btn-secondary">tritone</button>
+                  id='tritone' type="button" className="btn btn-secondary">tritone</button>
           <button onClick={this.onSelectInterval}
-                  id='P5' type="button" class="btn btn-secondary">P5</button><br/>
+                  id='P5' type="button" className="btn btn-secondary">P5</button><br/>
         </div>
-        <div class="button-area-line">
+        <div className="button-area-line">
           <button onClick={this.onSelectInterval}
-                  id='m6' type="button" class="btn btn-secondary">m6</button>
+                  id='m6' type="button" className="btn btn-secondary">m6</button>
           <button onClick={this.onSelectInterval}
-                  id='M6' type="button" class="btn btn-secondary">M6</button>
+                  id='M6' type="button" className="btn btn-secondary">M6</button>
           <button onClick={this.onSelectInterval}
-                  id='m7' type="button" class="btn btn-secondary">m7</button>
+                  id='m7' type="button" className="btn btn-secondary">m7</button>
           <button onClick={this.onSelectInterval}
-                  id='M7' type="button" class="btn btn-secondary">M7</button><br/>
+                  id='M7' type="button" className="btn btn-secondary">M7</button><br/>
         </div>
-        <div class="button-area-line">
-          <button id='score' onclick='onScore()' type="button" class="btn btn-secondary larger">Score</button>
+        <div className="button-area-line">
+          <button id='score' onclick='onScore()' type="button" className="btn btn-secondary larger">Score</button>
         </div>
-      </p>
       </div>
     );
   }
@@ -84,7 +90,7 @@ class ToneRowSettings extends React.Component {
     return (
       <div>
         <p>
-          <label for='speed'>Speed:</label>
+          <label htmlFor='speed'>Speed:</label>
             <select value={this.props.speed} name='speed' id='speed'
                     onChange={this.handleSpeedChange}>
             <option value='6'>Slow(6s)</option>
@@ -94,7 +100,7 @@ class ToneRowSettings extends React.Component {
           </select>
         </p>
         <p>
-          <label for='length'>Length:</label>
+          <label htmlFor='length'>Length:</label>
           <select value={this.props.length} name='length' id='length' onChange={this.handleLengthChange}>
             <option value='2'>2</option>
             <option value='3'>3</option>
@@ -139,31 +145,47 @@ class ToneRowTransport extends React.Component {
       <div>
         <button id='new'
                 onClick={this.handleOnNew}
-                class="btn btn-secondary larger extra-padding new-padding">New </button>
+                className="btn btn-secondary larger extra-padding new-padding">New </button>
         <br />
         <button id='play'
                 onClick={this.handleOnPlay}
-                class="btn btn-secondary larger extra-padding">▶️  PLAY</button>
+                className="btn btn-secondary larger extra-padding">▶️  PLAY</button>
         <button id='stop'
                 onClick={this.handleOnStop}
-                class="btn btn-secondary larger extra-padding">&#x23f9; STOP</button>
+                className="btn btn-secondary larger extra-padding">&#x23f9; STOP</button>
       </div>
     );
   }
 }
 
 class ToneRow extends React.Component {
+
   constructor(props) {
     super(props);
+    this.step = 0;
     this.state = {speed: 1,
                   length: 2,
-                  answers: []};
+                  answers: [],
+                  step: 0,
+                  gameState: "stateNew"};
+
     this.handleSpeedChange = this.handleSpeedChange.bind(this);
     this.handleLengthChange = this.handleLengthChange.bind(this);
     this.handleNew = this.handleNew.bind(this);
     this.handlePlay = this.handlePlay.bind(this);
     this.handleStop = this.handleStop.bind(this);
     this.handleSelectInterval = this.handleSelectInterval.bind(this);
+    this.playNote = this.playNote.bind(this);
+    
+    const MAX_LENGTH = 12;
+    let size = MAX_LENGTH;
+    let answers = [];
+    while(size--) {
+      let isHidden = size < this.state.length ? false : true;
+
+      answers[size-1]={answer: '', hidden: isHidden, highlight: false};
+    }
+    this.state.answers = answers;
   }
 
   handleSpeedChange(value) {
@@ -171,32 +193,80 @@ class ToneRow extends React.Component {
   }
   
   handleLengthChange(value) {
+    const MAX_LENGTH = 12;
+    let size = MAX_LENGTH;
+    let answers = [];
+    while(size--) {
+      let isHidden = size < value ? false : true;
+      answers[size-1]={answer: '', hidden: isHidden};
+    }
+    this.setState({answers: answers});
     this.setState({length: value});
   }
   
   handleNew() {
+    const MAX_LENGTH = 12;
+    let size = MAX_LENGTH;
+    let answers = [];
+    while(size--) {
+      let isHidden = size < this.state.length ? false : true;
+
+      answers[size-1]={answer: '', hidden: isHidden};
+    }
+    this.setState({answers: answers});
   }
 
   handlePlay() {
+    // delay half a sec before playing the first step
+    this.step = 0;
+    clearTimeout(this.timerId);
+    this.timerId = setTimeout(this.playNote, 500);
+  }
+
+  playNote() {
+    if( this.step > 0 && this.step < this.state.length ) {
+      let answers = [...this.state.answers];
+      const newAnswers = answers.map((answer, i) => {
+        let newAnswer = {...answer};
+        if(i === this.step-1) {
+          newAnswer["highlight"] = true;
+        } else {
+          newAnswer["highlight"] = false;
+        }
+        return newAnswer;
+      })
+      this.setState({answers: newAnswers});
+    }
+    this.timerId = setTimeout(this.playNote, this.state.speed * 1000);
+    this.step += 1;
+    if( this.step === this.state.length ) {
+      clearTimeout(this.timerId);
+      this.step--;
+    }
   }
 
   handleStop() {
+    clearTimeout(this.timerId);
   }
 
   handleSelectInterval(value) {
-    this.setState({answers: [value]});
+    if(this.step > 0) {
+      let answers = [...this.state.answers];
+      let answer = {...answers[this.step-1]};
+      let newAnswer = value;
+      let hidden = answer.hidden;
+      answer = {answer: newAnswer, hidden: hidden};
+      answers[this.step-1] = answer;
+      this.setState({answers: answers});
+    }
   }
 
   render() {
-    const intervalAnswers =
-            this.state.answers.map((answer) => 
-              <IntervalSelectionBox interval={answer} check="x" />
-            );
     return (
       <div>
         <div className="Exercises">
           <div className="App">
-            <div class="bg"></div>
+            <div className="bg"></div>
             <HackSpacer />
             <ToneRowSettings speed={this.state.speed}
                              onSpeedChange={this.handleSpeedChange}
@@ -205,13 +275,18 @@ class ToneRow extends React.Component {
                               onPlay={this.handlePlay}
                               onStop={this.handleStop}/>
             <ToneRowIntervalButtons onSelectInterval={this.handleSelectInterval}/>
-            {intervalAnswers}
+            {this.state.answers.map((answer, index) => 
+              (<IntervalSelectionBox key={index}
+                                     interval={answer["answer"]}
+                                     hidden={answer["hidden"]}
+                                     highlight={answer["highlight"]}
+                                     check="x" />
+              ))}
           </div>
         </div>
       </div>
     );
   }
 }
-
 
 export default ToneRow;
