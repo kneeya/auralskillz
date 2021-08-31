@@ -18,7 +18,20 @@ function IntervalSelectionBox(props) {
         "hidden" : "visible"};
   `;
   return (
-    <table><tbody><tr hidden={props.hidden}><td><Input highlight={props.highlight} readOnly value={props.interval} /></td><td>{props.check}</td></tr></tbody></table>
+    <div hidden={props.hidden}>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <Input highlight={props.highlight} readOnly value={props.interval} />
+            </td>
+            <td>
+              {props.check}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -218,12 +231,18 @@ class ToneRow extends React.Component {
 
   handlePlay() {
     // delay half a sec before playing the first step
-    this.step = 0;
+    this.step = -1;
     clearTimeout(this.timerId);
     this.timerId = setTimeout(this.playNote, 500);
   }
 
   playNote() {
+    this.step += 1;
+    if( this.step < this.state.length ) {
+      this.timerId = setTimeout(this.playNote, this.state.speed * 1000);
+    } else {
+      this.step--;
+    }
     if( this.step > 0 && this.step < this.state.length ) {
       let answers = [...this.state.answers];
       const newAnswers = answers.map((answer, i) => {
@@ -237,12 +256,6 @@ class ToneRow extends React.Component {
       })
       this.setState({answers: newAnswers});
     }
-    this.timerId = setTimeout(this.playNote, this.state.speed * 1000);
-    this.step += 1;
-    if( this.step === this.state.length ) {
-      clearTimeout(this.timerId);
-      this.step--;
-    }
   }
 
   handleStop() {
@@ -253,15 +266,18 @@ class ToneRow extends React.Component {
     if(this.step > 0) {
       let answers = [...this.state.answers];
       let answer = {...answers[this.step-1]};
-      let newAnswer = value;
-      let hidden = answer.hidden;
-      answer = {answer: newAnswer, hidden: hidden};
+      answer["answer"] = value;
       answers[this.step-1] = answer;
       this.setState({answers: answers});
     }
   }
 
   render() {
+    const Box = styled.div`
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(200px, 1fr));
+    `;
+    
     return (
       <div>
         <div className="Exercises">
@@ -275,13 +291,15 @@ class ToneRow extends React.Component {
                               onPlay={this.handlePlay}
                               onStop={this.handleStop}/>
             <ToneRowIntervalButtons onSelectInterval={this.handleSelectInterval}/>
+            <Box>
             {this.state.answers.map((answer, index) => 
               (<IntervalSelectionBox key={index}
                                      interval={answer["answer"]}
                                      hidden={answer["hidden"]}
                                      highlight={answer["highlight"]}
-                                     check="x" />
+                                     check="" />
               ))}
+            </Box>
           </div>
         </div>
       </div>

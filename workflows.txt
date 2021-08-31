@@ -1,0 +1,20 @@
+Page Load
+-state is new (out of new, started, stopped)
+-init new sequence from length
+-init interval boxes from length
+
+Start Button Pressed
+-state is started
+-disable length selector
+-disable speed selector
+-wait 500 ms
+-loop through sequence from beginning taking into account speed
+-for each step turn interval box green
+
+Stop Button Pressed
+-state is stopped
+-stop sequence
+
+Interval Button Pressed
+-if a button is coloured green, change box to that interval
+
