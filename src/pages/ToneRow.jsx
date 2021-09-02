@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 // import './ToneRow.css';
 
+let crypto = window.crypto || window.msCrypto;
+
 function HackSpacer() {
   return (
     <div>
@@ -172,13 +174,21 @@ class ToneRowTransport extends React.Component {
 }
 
 class ToneRow extends React.Component {
-
   constructor(props) {
     super(props);
+    
+    this.MIN_MIDI_NOTE = 43; // G2
+    this.MAX_MIDI_NOTE = 84; // C6
+    this.CHECK = '\u2705';
+    this.XMARK = '\u274c';
+    this.MAX_LENGTH = 12;
+
+    let initialSequence = this.generateSequence(2, this.MIN_MIDI_NOTE, this.MAX_MIDI_NOTE);
     this.step = 0;
     this.state = {speed: 1,
                   length: 2,
                   answers: [],
+                  sequence: initialSequence,
                   step: 0,
                   gameState: "stateNew"};
 
@@ -190,8 +200,7 @@ class ToneRow extends React.Component {
     this.handleSelectInterval = this.handleSelectInterval.bind(this);
     this.playNote = this.playNote.bind(this);
     
-    const MAX_LENGTH = 12;
-    let size = MAX_LENGTH;
+    let size = this.MAX_LENGTH;
     let answers = [];
     while(size--) {
       let isHidden = size < this.state.length ? false : true;
@@ -206,8 +215,7 @@ class ToneRow extends React.Component {
   }
   
   handleLengthChange(value) {
-    const MAX_LENGTH = 12;
-    let size = MAX_LENGTH;
+    let size = this.MAX_LENGTH;
     let answers = [];
     while(size--) {
       let isHidden = size < value ? false : true;
@@ -215,11 +223,12 @@ class ToneRow extends React.Component {
     }
     this.setState({answers: answers});
     this.setState({length: value});
+    let sequence = this.generateSequence(value, this.MIN_MIDI_NOTE, this.MAX_MIDI_NOTE);
+    this.setState({sequence: sequence});
   }
   
   handleNew() {
-    const MAX_LENGTH = 12;
-    let size = MAX_LENGTH;
+    let size = this.MAX_LENGTH;
     let answers = [];
     while(size--) {
       let isHidden = size < this.state.length ? false : true;
@@ -227,6 +236,8 @@ class ToneRow extends React.Component {
       answers[size-1]={answer: '', hidden: isHidden};
     }
     this.setState({answers: answers});
+    let sequence = this.generateSequence(this.state.length, this.MIN_MIDI_NOTE, this.MAX_MIDI_NOTE);
+    this.setState({sequence: sequence});
   }
 
   handlePlay() {
@@ -271,6 +282,82 @@ class ToneRow extends React.Component {
       this.setState({answers: answers});
     }
   }
+
+  generateSequence(length, min, max) {
+    let start = this.getRandomInt(min, max-length); // don't blow over the top note
+    let toneRow = [start];
+    for (let i = 1; i < length; ++i)
+      toneRow.push(++start);
+    toneRow = this.shuffle(toneRow);
+    return this.expand(toneRow);
+  }
+
+  getRandomInt(min, max) {
+    let byteArray = new Uint8Array(1);
+    crypto.getRandomValues(byteArray);
+
+    let range = max - min + 1;
+    const MAX_RANGE = 256;
+    if (byteArray[0] >= Math.floor(MAX_RANGE / range) * range)
+      return this.getRandomInt(min,max);
+    return min + (byteArray[0] % range);
+  }
+
+  shuffle(sequence) {
+    let byteArray = new Uint8Array(12);
+    crypto.getRandomValues(byteArray);
+    let randoms = [];
+    for (let i = 0; i < byteArray.length; ++i)
+      randoms.push(byteArray[i] / 256);
+    for (let i = sequence.length - 1; i > 0; i--) {
+      var j = Math.floor(randoms[i] * (i + 1));
+      var temp = sequence[i];
+      sequence[i] = sequence[j];
+      sequence[j] = temp;
+    }
+    return sequence;
+  }
+
+  expand(sequence) {
+    let byteArray = new Uint8Array(12);
+    crypto.getRandomValues(byteArray);
+    for (let i = 0; i < sequence.length; ++i) {
+      if (i === 0) continue;
+      if (sequence[i] < sequence[i-1]) {
+        // note is lower, make sure interval hasn't expanded beyond an octave
+        while (sequence[i-1] - sequence[i] > 12) {
+          //oops, its greater than an octave, so add an octave
+          sequence[i] = sequence[i] + 12;
+          //and continue...
+        }
+        if (byteArray[i]&1) {
+          // expand interval
+          if (sequence[i] < sequence[i-1]) {
+            // note is lower, add an octave if possible
+            if (sequence[i] + 12 <= this.MAX_MIDI_NOTE) {
+              sequence[i] = sequence[i] + 12;
+            }
+          }
+        }
+      } else {
+        // note is higher, make sure interval hasn't expanded beyond an octave
+        while (sequence[i] - sequence[i-1] > 12) {
+          //oops, its greater than an octave, so subtract an octave
+          sequence[i] = sequence[i] - 12;
+          //and continue...
+        }
+        if (byteArray[i]&1) {
+          // expand interval
+          // note is higher, subtract an octave if possible
+          if (sequence[i] - 12 >= this.MIN_MIDI_NOTE) {
+            sequence[i] = sequence[i] - 12;
+          }
+        }   
+      }
+    }
+    return sequence;
+  }
+
 
   render() {
     const Box = styled.div`
