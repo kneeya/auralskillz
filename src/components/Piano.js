@@ -97,9 +97,12 @@ class Piano {
       let gainNode = audioContext.createGain();
       //acGains.push(gainNode);
       let currentTime = audioContext.currentTime;
+      let noteOffTime = Number(currentTime) + Number(speed);
+      let decayOffTime = Number(noteOffTime) + .03;
+      //console.log(decayOffTime);
       gainNode.gain.setValueAtTime(1, currentTime);
-      gainNode.gain.setValueAtTime(1, currentTime + speed );
-      gainNode.gain.linearRampToValueAtTime(0, currentTime + speed + .03);
+      gainNode.gain.setValueAtTime(1, noteOffTime);
+      gainNode.gain.linearRampToValueAtTime(0, decayOffTime);
       let source = audioContext.createBufferSource();
       //acSources.push(source);
       let note = notes[i];
