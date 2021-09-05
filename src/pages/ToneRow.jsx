@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Piano from '../components/Piano';
 // import './ToneRow.css';
 
 let crypto = window.crypto || window.msCrypto;
@@ -8,6 +9,14 @@ function HackSpacer() {
   return (
     <div>
       <br/><br/><br/><br/><br/><br/>
+    </div>
+  );
+}
+
+function StatusRow(props) {
+  return (
+    <div>
+      <p>{props.message}</p>
     </div>
   );
 }
@@ -180,11 +189,13 @@ class ToneRow extends React.Component {
   constructor(props) {
     super(props);
     
+    this.defaultMessage = 'TODO make me invisible.';
     this.MIN_MIDI_NOTE = 43; // G2
     this.MAX_MIDI_NOTE = 84; // C6
     this.CHECK = '\u2705';
     this.XMARK = '\u274c';
     this.MAX_LENGTH = 12;
+    this.samplesToLoad = 0;
 
     let initialSequence = this.generateSequence(2, this.MIN_MIDI_NOTE, this.MAX_MIDI_NOTE);
     this.step = 0;
@@ -194,7 +205,9 @@ class ToneRow extends React.Component {
                   answer_results: [],
                   sequence: initialSequence,
                   step: 0,
-                  gameState: "stateNew"};
+                  gameState: "stateNew",
+                  statusMessage: this.defaultMessage,
+                  loadingSamples: false};
 
     this.handleSpeedChange = this.handleSpeedChange.bind(this);
     this.handleLengthChange = this.handleLengthChange.bind(this);
@@ -203,7 +216,9 @@ class ToneRow extends React.Component {
     this.handleStop = this.handleStop.bind(this);
     this.handleSelectInterval = this.handleSelectInterval.bind(this);
     this.handleScore = this.handleScore.bind(this);
+    this.startPlayAfterSoundsLoaded = this.startPlayAfterSoundsLoaded.bind(this);
     this.playNote = this.playNote.bind(this);
+    this.onSampleLoaded = this.onSampleLoaded.bind(this);
     
     let size = this.state.length;
     let answers = [];
@@ -273,16 +288,42 @@ class ToneRow extends React.Component {
   }
 
   handlePlay() {
+    Piano.audioContext.resume().then(() => {
+      this.samplesToLoad = this.state.length;
+      this.setState({statusMessage: "Loading"});
+      Piano.loadSounds(this.state.sequence, this.onSampleLoaded);
+    })
+  }
+
+  onSampleLoaded() {
+    if( this.samplesToLoad > 0 ) {
+      this.samplesToLoad--;
+      let message = "Loading";
+      for(let i = 0; i < (this.state.length - this.samplesToLoad); ++i) {
+        message = message +  ".";
+      }
+      this.setState({statusMessage: message});
+    }
+    if( this.samplesToLoad === 0 ) {
+      this.setState({loadingSamples: false});
+      this.startPlayAfterSoundsLoaded();
+    }
+  }
+
+  startPlayAfterSoundsLoaded() {
+    this.setState({statusMessage: this.defaultMessage});
     // delay half a sec before playing the first step
     this.step = -1;
     clearTimeout(this.timerId);
-    this.timerId = setTimeout(this.playNote, 500);
+    let delay = 500;
+    this.timerId = setTimeout(this.playNote, delay);
   }
 
   playNote() {
     this.step += 1;
     if( this.step < this.state.length ) {
       this.timerId = setTimeout(this.playNote, this.state.speed * 1000);
+      Piano.playNotes([this.state.sequence[this.step]], this.state.speed);
     } else {
       this.step--;
     }
@@ -338,8 +379,8 @@ class ToneRow extends React.Component {
     for (let i = 0; i < byteArray.length; ++i)
       randoms.push(byteArray[i] / 256);
     for (let i = sequence.length - 1; i > 0; i--) {
-      var j = Math.floor(randoms[i] * (i + 1));
-      var temp = sequence[i];
+      let j = Math.floor(randoms[i] * (i + 1));
+      let temp = sequence[i];
       sequence[i] = sequence[j];
       sequence[j] = temp;
     }
@@ -399,6 +440,7 @@ class ToneRow extends React.Component {
           <div className="App">
             <div className="bg"></div>
             <HackSpacer />
+            <StatusRow message={this.state.statusMessage} />
             <ToneRowSettings speed={this.state.speed}
                              onSpeedChange={this.handleSpeedChange}
                              onLengthChange={this.handleLengthChange}/>
