@@ -89,9 +89,24 @@ let pianoFiles =
   {loaded: false, url: '/piano/Piano.mf.C6_1.wav'}
 ];
 
+let onSourceEnded = (e) => {
+  //console.log(acSources);
+  acSources.splice(acSources.indexOf(e.srcElement), 1);
+  //console.log(acSources);
+};
+
+let acSources = [];
+
 class Piano {
 
   static audioContext = audioContext;
+
+  static stop() {
+    for (let i = 0; i < acSources.length; ++i) {
+      if(acSources[i]) acSources[i].stop();
+    }
+  }
+
   static playNotes(notes, speed) {
     for(let i = 0; i < notes.length; ++i) {
       let gainNode = audioContext.createGain();
@@ -104,12 +119,13 @@ class Piano {
       gainNode.gain.setValueAtTime(1, noteOffTime);
       gainNode.gain.linearRampToValueAtTime(0, decayOffTime);
       let source = audioContext.createBufferSource();
-      //acSources.push(source);
       let note = notes[i];
       source.buffer = pianoSounds[note];
       source.connect(gainNode);
       //source.connect(audioContext.destination);
       gainNode.connect(audioContext.destination);
+      acSources.push(source);
+      source.onended = onSourceEnded;
       source.start();
       //console.log('I played a sound');
     }
@@ -154,8 +170,6 @@ class Piano {
       }
     }
   }
-
-
 }
 
 export default Piano

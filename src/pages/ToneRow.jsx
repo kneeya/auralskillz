@@ -289,6 +289,7 @@ class ToneRow extends React.Component {
 
   handlePlay() {
     Piano.audioContext.resume().then(() => {
+      this.step = -1;
       this.samplesToLoad = this.state.length;
       this.setState({statusMessage: "Loading"});
       Piano.loadSounds(this.state.sequence, this.onSampleLoaded);
@@ -313,7 +314,6 @@ class ToneRow extends React.Component {
   startPlayAfterSoundsLoaded() {
     this.setState({statusMessage: this.defaultMessage});
     // delay half a sec before playing the first step
-    this.step = -1;
     clearTimeout(this.timerId);
     let delay = 500;
     this.timerId = setTimeout(this.playNote, delay);
@@ -339,6 +339,7 @@ class ToneRow extends React.Component {
 
   handleStop() {
     clearTimeout(this.timerId);
+    Piano.stop();
   }
 
   handleSelectInterval(value) {
