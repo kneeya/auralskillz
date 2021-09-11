@@ -21,27 +21,42 @@ function StatusRow(props) {
   );
 }
 
-function IntervalSelectionBox(props) {
-  const Input = styled.input`
-    background-color: ${props => props.highlight ?
-        "palegreen" : "white"};
-  `;
+const Input = styled.input`
+  background-color: ${props => props.highlight ?
+      "palegreen" : "white"};
+`;
+  
+class AnswerBox extends React.Component {
+  constructor(props) {
+    super(props);
+    
+    this.onSelect = this.onSelect.bind(this);
+
+  }
+
+  onSelect (e) {
+    this.props.onSelect(this.props.id);
+  }
+
+
+  render() {
   return (
-    <div>
-      <table>
-        <tbody>
-          <tr>
-            <td>
-              <Input highlight={props.highlight} readOnly value={props.interval} />
-            </td>
-            <td>
-              {props.check}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
+      <div>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <Input onClick={this.onSelect} highlight={this.props.highlight} readOnly value={this.props.interval} />
+              </td>
+              <td>
+                {this.props.check}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
+  }
 }
 
 class ToneRowIntervalButtons extends React.Component {
@@ -196,6 +211,7 @@ class ToneRow extends React.Component {
     this.XMARK = '\u274c';
     this.MAX_LENGTH = 12;
     this.samplesToLoad = 0;
+    this.canSelectManually = false;
 
     let initialSequence = this.generateSequence(2, this.MIN_MIDI_NOTE, this.MAX_MIDI_NOTE);
     this.step = 0;
@@ -216,6 +232,7 @@ class ToneRow extends React.Component {
     this.handleStop = this.handleStop.bind(this);
     this.handleSelectInterval = this.handleSelectInterval.bind(this);
     this.handleScore = this.handleScore.bind(this);
+    this.handleAnswerBoxSelected = this.handleAnswerBoxSelected.bind(this);
     this.startPlayAfterSoundsLoaded = this.startPlayAfterSoundsLoaded.bind(this);
     this.playNote = this.playNote.bind(this);
     this.onSampleLoaded = this.onSampleLoaded.bind(this);
@@ -226,6 +243,13 @@ class ToneRow extends React.Component {
       answers[size-1]={answer: ''};
     }
     this.state.answers = answers;
+  }
+
+  handleAnswerBoxSelected(value) {
+    if(this.canSelectManually) {
+      this.step = value + 1;
+      this.forceUpdate();
+    }
   }
 
   handleScore() {
@@ -262,6 +286,7 @@ class ToneRow extends React.Component {
   
   handleLengthChange(value) {
     this.step = -1;
+    this.canSelectManually = false;
     let size = value;
     let answers = [];
     while(size--) {
@@ -276,6 +301,7 @@ class ToneRow extends React.Component {
   
   handleNew() {
     this.step = -1;
+    this.canSelectManually = false;
     let size = this.state.length;
     let answers = [];
     while(size--) {
@@ -290,6 +316,7 @@ class ToneRow extends React.Component {
   handlePlay() {
     Piano.audioContext.resume().then(() => {
       this.step = -1;
+      this.canSelectManually = false;
       this.samplesToLoad = this.state.length;
       this.setState({statusMessage: "Loading"});
       Piano.loadSounds(this.state.sequence, this.onSampleLoaded);
@@ -326,6 +353,7 @@ class ToneRow extends React.Component {
       Piano.playNotes([this.state.sequence[this.step]], this.state.speed);
     } else {
       this.step--;
+      this.canSelectManually = true;
     }
     if( this.step > 0 && this.step < this.state.length ) {
       let answers = [...this.state.answers];
@@ -339,6 +367,7 @@ class ToneRow extends React.Component {
 
   handleStop() {
     clearTimeout(this.timerId);
+    this.canSelectManually = true;
     Piano.stop();
   }
 
@@ -452,7 +481,9 @@ class ToneRow extends React.Component {
                                     onScore={this.handleScore}/>
             <Box>
             {this.state.answers.map((answer, index) => 
-              (<IntervalSelectionBox key={index}
+              (<AnswerBox key={index}
+                                     id={index}
+                                     onSelect={this.handleAnswerBoxSelected}
                                      interval={answer["answer"]}
                                      highlight={index === this.step-1}
                                      check={this.state.answerResults &&
