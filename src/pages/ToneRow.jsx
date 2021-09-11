@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Piano from '../components/Piano';
 // import './ToneRow.css';
 
 let crypto = window.crypto || window.msCrypto;
@@ -12,39 +13,65 @@ function HackSpacer() {
   );
 }
 
-function IntervalSelectionBox(props) {
-  const Input = styled.input`
-    background-color: ${props => props.highlight ?
-        "palegreen" : "white"};
-    visibility: ${props => props.hidden ?
-        "hidden" : "visible"};
-  `;
+function StatusRow(props) {
   return (
-    <div hidden={props.hidden}>
-      <table>
-        <tbody>
-          <tr>
-            <td>
-              <Input highlight={props.highlight} readOnly value={props.interval} />
-            </td>
-            <td>
-              {props.check}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div>
+      <p>{props.message}</p>
     </div>
   );
+}
+
+const Input = styled.input`
+  background-color: ${props => props.highlight ?
+      "palegreen" : "white"};
+`;
+  
+class AnswerBox extends React.Component {
+  constructor(props) {
+    super(props);
+    
+    this.onSelect = this.onSelect.bind(this);
+
+  }
+
+  onSelect (e) {
+    this.props.onSelect(this.props.id);
+  }
+
+
+  render() {
+  return (
+      <div>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <Input onClick={this.onSelect} highlight={this.props.highlight} readOnly value={this.props.interval} />
+              </td>
+              <td>
+                {this.props.check}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
+  }
 }
 
 class ToneRowIntervalButtons extends React.Component {
   constructor(props) {
     super(props);
     this.onSelectInterval = this.onSelectInterval.bind(this);
+    this.onScore = this.onScore.bind(this);
   }
   
   onSelectInterval(e) {
     this.props.onSelectInterval(e.target.id);
+  }
+
+  onScore() {
+    this.props.onScore();
   }
 
   render() {
@@ -79,7 +106,7 @@ class ToneRowIntervalButtons extends React.Component {
                   id='M7' type="button" className="btn btn-secondary">M7</button><br/>
         </div>
         <div className="button-area-line">
-          <button id='score' onclick='onScore()' type="button" className="btn btn-secondary larger">Score</button>
+          <button id='score' onClick={this.onScore} type="button" className="btn btn-secondary larger">Score</button>
         </div>
       </div>
     );
@@ -177,20 +204,26 @@ class ToneRow extends React.Component {
   constructor(props) {
     super(props);
     
+    this.defaultMessage = 'TODO make me invisible.';
     this.MIN_MIDI_NOTE = 43; // G2
     this.MAX_MIDI_NOTE = 84; // C6
     this.CHECK = '\u2705';
     this.XMARK = '\u274c';
     this.MAX_LENGTH = 12;
+    this.samplesToLoad = 0;
+    this.canSelectManually = false;
 
     let initialSequence = this.generateSequence(2, this.MIN_MIDI_NOTE, this.MAX_MIDI_NOTE);
     this.step = 0;
     this.state = {speed: 1,
                   length: 2,
                   answers: [],
+                  answer_results: [],
                   sequence: initialSequence,
                   step: 0,
-                  gameState: "stateNew"};
+                  gameState: "stateNew",
+                  statusMessage: this.defaultMessage,
+                  loadingSamples: false};
 
     this.handleSpeedChange = this.handleSpeedChange.bind(this);
     this.handleLengthChange = this.handleLengthChange.bind(this);
@@ -198,16 +231,53 @@ class ToneRow extends React.Component {
     this.handlePlay = this.handlePlay.bind(this);
     this.handleStop = this.handleStop.bind(this);
     this.handleSelectInterval = this.handleSelectInterval.bind(this);
+    this.handleScore = this.handleScore.bind(this);
+    this.handleAnswerBoxSelected = this.handleAnswerBoxSelected.bind(this);
+    this.startPlayAfterSoundsLoaded = this.startPlayAfterSoundsLoaded.bind(this);
     this.playNote = this.playNote.bind(this);
+    this.onSampleLoaded = this.onSampleLoaded.bind(this);
     
-    let size = this.MAX_LENGTH;
+    let size = this.state.length;
     let answers = [];
     while(size--) {
-      let isHidden = size < this.state.length ? false : true;
-
-      answers[size-1]={answer: '', hidden: isHidden, highlight: false};
+      answers[size-1]={answer: ''};
     }
     this.state.answers = answers;
+  }
+
+  handleAnswerBoxSelected(value) {
+    if(this.canSelectManually) {
+      this.step = value + 1;
+      this.forceUpdate();
+    }
+  }
+
+  handleScore() {
+    let intervalMap = {'m2': 1,
+               'M2': 2,
+               'm3': 3,
+               'M3': 4,
+               'P4': 5,
+               'tritone': 6,
+               'P5': 7,
+               'm6': 8,
+               'M6': 9,
+               'm7': 10,
+               'M7': 11 };
+    let length = this.state.length;
+    let sequence = this.state.sequence;
+    let answers = this.state.answers;
+    let answerResults = [];
+    for(let i = 1; i < length; ++i) {
+      let correctInterval = Math.abs(sequence[i]-sequence[i-1]);
+      let selectedInterval = intervalMap[answers[i-1].answer];
+      if(correctInterval === selectedInterval) {
+        answerResults[i-1] = this.CHECK;
+      } else {
+        answerResults[i-1] = this.XMARK;
+      }
+    }
+    this.setState({answerResults: answerResults});
   }
 
   handleSpeedChange(value) {
@@ -215,54 +285,80 @@ class ToneRow extends React.Component {
   }
   
   handleLengthChange(value) {
-    let size = this.MAX_LENGTH;
+    this.step = -1;
+    this.canSelectManually = false;
+    let size = value;
     let answers = [];
     while(size--) {
-      let isHidden = size < value ? false : true;
-      answers[size-1]={answer: '', hidden: isHidden};
+      answers[size-1]={answer: ''};
     }
     this.setState({answers: answers});
     this.setState({length: value});
     let sequence = this.generateSequence(value, this.MIN_MIDI_NOTE, this.MAX_MIDI_NOTE);
     this.setState({sequence: sequence});
+    this.setState({answerResults: []});
   }
   
   handleNew() {
-    let size = this.MAX_LENGTH;
+    this.step = -1;
+    this.canSelectManually = false;
+    let size = this.state.length;
     let answers = [];
     while(size--) {
-      let isHidden = size < this.state.length ? false : true;
-
-      answers[size-1]={answer: '', hidden: isHidden};
+      answers[size-1]={answer: ''};
     }
     this.setState({answers: answers});
     let sequence = this.generateSequence(this.state.length, this.MIN_MIDI_NOTE, this.MAX_MIDI_NOTE);
     this.setState({sequence: sequence});
+    this.setState({answerResults: []});
   }
 
   handlePlay() {
+    Piano.audioContext.resume().then(() => {
+      this.step = -1;
+      this.canSelectManually = false;
+      this.samplesToLoad = this.state.length;
+      this.setState({statusMessage: "Loading"});
+      Piano.loadSounds(this.state.sequence, this.onSampleLoaded);
+    })
+  }
+
+  onSampleLoaded() {
+    if( this.samplesToLoad > 0 ) {
+      this.samplesToLoad--;
+      let message = "Loading";
+      for(let i = 0; i < (this.state.length - this.samplesToLoad); ++i) {
+        message = message +  ".";
+      }
+      this.setState({statusMessage: message});
+    }
+    if( this.samplesToLoad === 0 ) {
+      this.setState({loadingSamples: false});
+      this.startPlayAfterSoundsLoaded();
+    }
+  }
+
+  startPlayAfterSoundsLoaded() {
+    this.setState({statusMessage: this.defaultMessage});
     // delay half a sec before playing the first step
-    this.step = -1;
     clearTimeout(this.timerId);
-    this.timerId = setTimeout(this.playNote, 500);
+    let delay = 500;
+    this.timerId = setTimeout(this.playNote, delay);
   }
 
   playNote() {
     this.step += 1;
     if( this.step < this.state.length ) {
       this.timerId = setTimeout(this.playNote, this.state.speed * 1000);
+      Piano.playNotes([this.state.sequence[this.step]], this.state.speed);
     } else {
       this.step--;
+      this.canSelectManually = true;
     }
     if( this.step > 0 && this.step < this.state.length ) {
       let answers = [...this.state.answers];
       const newAnswers = answers.map((answer, i) => {
         let newAnswer = {...answer};
-        if(i === this.step-1) {
-          newAnswer["highlight"] = true;
-        } else {
-          newAnswer["highlight"] = false;
-        }
         return newAnswer;
       })
       this.setState({answers: newAnswers});
@@ -271,6 +367,8 @@ class ToneRow extends React.Component {
 
   handleStop() {
     clearTimeout(this.timerId);
+    this.canSelectManually = true;
+    Piano.stop();
   }
 
   handleSelectInterval(value) {
@@ -284,12 +382,13 @@ class ToneRow extends React.Component {
   }
 
   generateSequence(length, min, max) {
-    let start = this.getRandomInt(min, max-length); // don't blow over the top note
+    let start = this.getRandomInt(min, max-12); // don't blow over the top note
     let toneRow = [start];
-    for (let i = 1; i < length; ++i)
+    for (let i = 1; i < 12; ++i)
       toneRow.push(++start);
     toneRow = this.shuffle(toneRow);
-    return this.expand(toneRow);
+    toneRow = this.expand(toneRow);
+    return toneRow.slice(0,length);
   }
 
   getRandomInt(min, max) {
@@ -310,8 +409,8 @@ class ToneRow extends React.Component {
     for (let i = 0; i < byteArray.length; ++i)
       randoms.push(byteArray[i] / 256);
     for (let i = sequence.length - 1; i > 0; i--) {
-      var j = Math.floor(randoms[i] * (i + 1));
-      var temp = sequence[i];
+      let j = Math.floor(randoms[i] * (i + 1));
+      let temp = sequence[i];
       sequence[i] = sequence[j];
       sequence[j] = temp;
     }
@@ -371,20 +470,25 @@ class ToneRow extends React.Component {
           <div className="App">
             <div className="bg"></div>
             <HackSpacer />
+            <StatusRow message={this.state.statusMessage} />
             <ToneRowSettings speed={this.state.speed}
                              onSpeedChange={this.handleSpeedChange}
                              onLengthChange={this.handleLengthChange}/>
             <ToneRowTransport onNew={this.handleNew}
                               onPlay={this.handlePlay}
                               onStop={this.handleStop}/>
-            <ToneRowIntervalButtons onSelectInterval={this.handleSelectInterval}/>
+            <ToneRowIntervalButtons onSelectInterval={this.handleSelectInterval}
+                                    onScore={this.handleScore}/>
             <Box>
             {this.state.answers.map((answer, index) => 
-              (<IntervalSelectionBox key={index}
+              (<AnswerBox key={index}
+                                     id={index}
+                                     onSelect={this.handleAnswerBoxSelected}
                                      interval={answer["answer"]}
-                                     hidden={answer["hidden"]}
-                                     highlight={answer["highlight"]}
-                                     check="" />
+                                     highlight={index === this.step-1}
+                                     check={this.state.answerResults &&
+                                            this.state.answerResults[index] ?
+                                       this.state.answerResults[index] : '' } />
               ))}
             </Box>
           </div>
