@@ -4,12 +4,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter as Router } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
+import Analytics from 'react-router-ga'
 
 ReactDOM.render(
-  <Router>
-    <App />
-  </Router>,
+  <BrowserRouter>
+    <Analytics id="G-G3CW5QHFWT" debug>
+      <App />
+    </Analytics>
+  </BrowserRouter>,
   document.getElementById('root')
 );
 
