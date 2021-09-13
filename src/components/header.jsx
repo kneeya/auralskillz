@@ -9,7 +9,7 @@ const Header = () => {
                 <Navbar.Collapse id="basic-navbar-nav">
                 </Navbar.Collapse>
                 <Nav className="me-auto">
-                        <Nav.Link href="/Home">Home</Nav.Link>
+                        <Nav.Link href="/">Home</Nav.Link>
                         <NavDropdown title="Exercises" id="basic-nav-dropdown">
                             <NavDropdown.Item href="/ToneRow">Tone Row Identification</NavDropdown.Item>
                             <NavDropdown.Item href="/SeventhChords">Seventh Chords</NavDropdown.Item>

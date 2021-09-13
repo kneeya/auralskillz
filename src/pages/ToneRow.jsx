@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Piano from '../components/Piano';
-// import './ToneRow.css';
+import './Pages.css';
 
 let crypto = window.crypto || window.msCrypto;
 
@@ -42,7 +42,7 @@ class AnswerBox extends React.Component {
   render() {
   return (
       <div>
-        <table>
+        <table className="center">
           <tbody>
             <tr>
               <td>
@@ -131,7 +131,7 @@ class ToneRowSettings extends React.Component {
   render() {
     return (
       <div>
-        <p>
+        <p className="text-center">
           <label htmlFor='speed'>Speed:</label>
             <select value={this.props.speed} name='speed' id='speed'
                     onChange={this.handleSpeedChange}>
@@ -141,7 +141,7 @@ class ToneRowSettings extends React.Component {
             <option value='1'>Very Fast(1s)</option>
           </select>
         </p>
-        <p>
+        <p className="text-center">
           <label htmlFor='length'>Length:</label>
           <select value={this.props.length} name='length' id='length' onChange={this.handleLengthChange}>
             <option value='2'>2</option>
@@ -189,12 +189,14 @@ class ToneRowTransport extends React.Component {
                 onClick={this.handleOnNew}
                 className="btn btn-secondary larger extra-padding new-padding">New </button>
         <br />
+        <div className="container">
         <button id='play'
                 onClick={this.handleOnPlay}
-                className="btn btn-secondary larger extra-padding">▶️  PLAY</button>
+                className="btn btn-secondary larger extra-padding controls">▶️  PLAY</button>
         <button id='stop'
                 onClick={this.handleOnStop}
-                className="btn btn-secondary larger extra-padding">&#x23f9; STOP</button>
+                className="btn btn-secondary larger extra-padding controls">&#x23f9; STOP</button>
+                </div>
       </div>
     );
   }
@@ -466,11 +468,11 @@ class ToneRow extends React.Component {
     
     return (
       <div>
-        <div className="Exercises">
+        <div className="center Exercises">
           <div className="App">
             <div className="bg"></div>
             <HackSpacer />
-            <StatusRow message={this.state.statusMessage} />
+            <div className="hide"><StatusRow message={this.state.statusMessage} /></div>
             <ToneRowSettings speed={this.state.speed}
                              onSpeedChange={this.handleSpeedChange}
                              onLengthChange={this.handleLengthChange}/>

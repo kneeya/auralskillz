@@ -1,0 +1,29 @@
+.hide {
+    display: none;
+    visibility: hidden;
+}
+
+.center {
+    max-width: 500px;
+    margin: auto;
+}
+
+.text-center {
+  text-align: center;
+}
+
+#new {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 40%;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.controls {
+  flex: 50%; /* or - flex: 0 50% - or - flex-basis: 50% - */
+}
