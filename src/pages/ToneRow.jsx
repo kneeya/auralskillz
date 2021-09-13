@@ -5,14 +5,6 @@ import './Pages.css';
 
 let crypto = window.crypto || window.msCrypto;
 
-function HackSpacer() {
-  return (
-    <div>
-      <br/><br/><br/><br/><br/><br/>
-    </div>
-  );
-}
-
 function StatusRow(props) {
   return (
     <div>
@@ -471,7 +463,6 @@ class ToneRow extends React.Component {
         <div className="center Exercises">
           <div className="App">
             <div className="bg"></div>
-            <HackSpacer />
             <div className="hide"><StatusRow message={this.state.statusMessage} /></div>
             <ToneRowSettings speed={this.state.speed}
                              onSpeedChange={this.handleSpeedChange}
