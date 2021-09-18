@@ -6,10 +6,10 @@ import ToneRow from './pages/ToneRow';
 import SeventhChords from './pages/SeventhChords';
 import { Route, Switch } from 'react-router-dom';
 
-function App() {
+function App(props) {
   return (
     <div className="App">
-      <Header/>
+      <Header basename={props.basename}/>
       <Switch>
         <Route exact path='/' component={Home}/>
         <Route path='/ToneRow' component={ToneRow}/>
