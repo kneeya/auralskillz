@@ -1,3 +1,5 @@
+import {basename} from '../index';
+
 let audioContext = new (window.AudioContext || window.webkitAudioContext)();
 let pianoSounds = [];
 let pianoFiles =
@@ -145,7 +147,7 @@ class Piano {
       if (pianoFiles[note].loaded === true) {
         progressCallback();
       } else {
-        let url = pianoFiles[note].url;
+        let url = basename + pianoFiles[note].url;
         let request = new XMLHttpRequest();
         request.open("GET", url, true);
         request.responseType = "arraybuffer";
