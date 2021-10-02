@@ -460,8 +460,8 @@ class ToneRow extends React.Component {
     
     return (
       <div>
-        <div className="center Exercises">
-          <div className="App">
+        <div className="Exercises">
+          <div className="center App">
             <div className="bg"></div>
             <div className="hide"><StatusRow message={this.state.statusMessage} /></div>
             <ToneRowSettings speed={this.state.speed}
@@ -472,19 +472,19 @@ class ToneRow extends React.Component {
                               onStop={this.handleStop}/>
             <ToneRowIntervalButtons onSelectInterval={this.handleSelectInterval}
                                     onScore={this.handleScore}/>
-            <Box>
-            {this.state.answers.map((answer, index) => 
-              (<AnswerBox key={index}
-                                     id={index}
-                                     onSelect={this.handleAnswerBoxSelected}
-                                     interval={answer["answer"]}
-                                     highlight={index === this.step-1}
-                                     check={this.state.answerResults &&
-                                            this.state.answerResults[index] ?
-                                       this.state.answerResults[index] : '' } />
-              ))}
-            </Box>
           </div>
+          <Box className="compact">
+          {this.state.answers.map((answer, index) => 
+            (<AnswerBox key={index}
+                                   id={index}
+                                   onSelect={this.handleAnswerBoxSelected}
+                                   interval={answer["answer"]}
+                                   highlight={index === this.step-1}
+                                   check={this.state.answerResults &&
+                                          this.state.answerResults[index] ?
+                                     this.state.answerResults[index] : '' } />
+            ))}
+          </Box>
         </div>
       </div>
     );

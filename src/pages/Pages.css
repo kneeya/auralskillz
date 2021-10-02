@@ -27,3 +27,10 @@
 .controls {
   flex: 50%; /* or - flex: 0 50% - or - flex-basis: 50% - */
 }
+
+.compact {
+  max-width: 70%;
+  margin: auto;
+  justify-content: center;
+}
+
