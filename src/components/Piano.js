@@ -48,47 +48,47 @@ let pianoFiles =
   {loaded: false, url: ''}, // MIDI 41
   {loaded: false, url: ''}, // MIDI 42
   {loaded: false, url: '/piano/Piano.mf.G2_1.wav'}, // MIDI 43
-  {loaded: false, url: '/piano/Piano.mf.Ab2_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.A2_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Bb2_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.B2_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.C3_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Db3_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.D3_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Eb3_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.E3_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.F3_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Gb3_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.G3_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Ab3_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.A3_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Bb3_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.B3_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.C4_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Db4_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.D4_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Eb4_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.E4_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.F4_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Gb4_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.G4_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Ab4_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.A4_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Bb4_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.B4_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.C5_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Db5_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.D5_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Eb5_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.E5_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.F5_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Gb5_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.G5_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Ab5_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.A5_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.Bb5_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.B5_1.wav'},
-  {loaded: false, url: '/piano/Piano.mf.C6_1.wav'}
+  {loaded: false, url: '/piano/Piano.mf.Ab2_1.wav'},// MIDI 44
+  {loaded: false, url: '/piano/Piano.mf.A2_1.wav'}, // MIDI 45
+  {loaded: false, url: '/piano/Piano.mf.Bb2_1.wav'},// MIDI 46
+  {loaded: false, url: '/piano/Piano.mf.B2_1.wav'}, // MIDI 47
+  {loaded: false, url: '/piano/Piano.mf.C3_1.wav'}, // MIDI 48
+  {loaded: false, url: '/piano/Piano.mf.Db3_1.wav'},// MIDI 49
+  {loaded: false, url: '/piano/Piano.mf.D3_1.wav'}, // MIDI 50
+  {loaded: false, url: '/piano/Piano.mf.Eb3_1.wav'},// MIDI 51
+  {loaded: false, url: '/piano/Piano.mf.E3_1.wav'}, // MIDI 52
+  {loaded: false, url: '/piano/Piano.mf.F3_1.wav'}, // MIDI 53
+  {loaded: false, url: '/piano/Piano.mf.Gb3_1.wav'},// MIDI 54
+  {loaded: false, url: '/piano/Piano.mf.G3_1.wav'}, // MIDI 55
+  {loaded: false, url: '/piano/Piano.mf.Ab3_1.wav'},// MIDI 56
+  {loaded: false, url: '/piano/Piano.mf.A3_1.wav'}, // MIDI 57
+  {loaded: false, url: '/piano/Piano.mf.Bb3_1.wav'},// MIDI 58
+  {loaded: false, url: '/piano/Piano.mf.B3_1.wav'}, // MIDI 59
+  {loaded: false, url: '/piano/Piano.mf.C4_1.wav'}, // MIDI 60
+  {loaded: false, url: '/piano/Piano.mf.Db4_1.wav'},// MIDI 61
+  {loaded: false, url: '/piano/Piano.mf.D4_1.wav'}, // MIDI 62
+  {loaded: false, url: '/piano/Piano.mf.Eb4_1.wav'},// MIDI 63
+  {loaded: false, url: '/piano/Piano.mf.E4_1.wav'}, // MIDI 64
+  {loaded: false, url: '/piano/Piano.mf.F4_1.wav'}, // MIDI 65
+  {loaded: false, url: '/piano/Piano.mf.Gb4_1.wav'},// MIDI 66
+  {loaded: false, url: '/piano/Piano.mf.G4_1.wav'}, // MIDI 67
+  {loaded: false, url: '/piano/Piano.mf.Ab4_1.wav'},// MIDI 68
+  {loaded: false, url: '/piano/Piano.mf.A4_1.wav'}, // MIDI 69
+  {loaded: false, url: '/piano/Piano.mf.Bb4_1.wav'},// MIDI 70
+  {loaded: false, url: '/piano/Piano.mf.B4_1.wav'}, // MIDI 71
+  {loaded: false, url: '/piano/Piano.mf.C5_1.wav'}, // MIDI 72
+  {loaded: false, url: '/piano/Piano.mf.Db5_1.wav'},// MIDI 73
+  {loaded: false, url: '/piano/Piano.mf.D5_1.wav'}, // MIDI 74
+  {loaded: false, url: '/piano/Piano.mf.Eb5_1.wav'},// MIDI 75
+  {loaded: false, url: '/piano/Piano.mf.E5_1.wav'}, // MIDI 76
+  {loaded: false, url: '/piano/Piano.mf.F5_1.wav'}, // MIDI 77
+  {loaded: false, url: '/piano/Piano.mf.Gb5_1.wav'},// MIDI 78
+  {loaded: false, url: '/piano/Piano.mf.G5_1.wav'}, // MIDI 79
+  {loaded: false, url: '/piano/Piano.mf.Ab5_1.wav'},// MIDI 80
+  {loaded: false, url: '/piano/Piano.mf.A5_1.wav'}, // MIDI 81
+  {loaded: false, url: '/piano/Piano.mf.Bb5_1.wav'},// MIDI 82
+  {loaded: false, url: '/piano/Piano.mf.B5_1.wav'}, // MIDI 83
+  {loaded: false, url: '/piano/Piano.mf.C6_1.wav'}  // MIDI 84
 ];
 
 let onSourceEnded = (e) => {
